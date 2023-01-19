@@ -4,34 +4,75 @@ import lombok.AllArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.Specification;
 import ru.melnikov.entity.Contact;
+import ru.melnikov.entity.Contact_;
 import ru.melnikov.entity.Email;
+import ru.melnikov.entity.Project;
+import ru.melnikov.filter.ContactFilter;
 
 import javax.persistence.criteria.*;
 
-@AllArgsConstructor
-public class ContactSpecification implements Specification<Contact> {
-    private SearchCriteria criteria;
 
-    @Override
-    public Predicate toPredicate(Root<Contact> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-        if (criteria.getOperation().equalsIgnoreCase(">")) {
-            return criteriaBuilder.greaterThanOrEqualTo(
-                    root.get(criteria.getKey()), criteria.getValue().toString());
-        } else if (criteria.getOperation().equalsIgnoreCase("<")) {
-            return criteriaBuilder.lessThanOrEqualTo(
-                    root.get(criteria.getKey()), criteria.getValue().toString());
-        } else if (criteria.getOperation().equalsIgnoreCase(":")) {
-            Root<Email> rootEmail = query.from(Email.class);
-            //rootEmail.join(rootEmail.get())
-            Join<Contact, Email> emailJoin =  root.join(String.valueOf(root.get("emails")));
-            if (root.get(criteria.getKey()).getJavaType() == String.class) {
-                return criteriaBuilder.like(
-                        root.get(criteria.getKey()), "%" + criteria.getValue() + "%");
-            } else {
-                return criteriaBuilder.equal(root.get(criteria.getKey()), criteria.getValue());
+public class ContactSpecification {
+    public static Specification<Contact> departmentSpec(ContactFilter contactFilter) {
+        return new Specification<>() {
+            @Override
+            public Predicate toPredicate(Root<Contact> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                query.distinct(true);
+                return root.get(Contact_.department).in(contactFilter.getIdDepartment());
             }
-        }
-        return null;
+        };
+    }
+
+    public static Specification<Contact> emailSpec(ContactFilter contactFilter) {
+        return new Specification<>() {
+            @Override
+            public Predicate toPredicate(Root<Contact> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                query.distinct(true);
+                Join<Email, Contact> emailContactJoin = root.join("emails");
+                return criteriaBuilder.like(emailContactJoin.get("email"), "%" + contactFilter.getEmail() + "%");
+            }
+        };
+    }
+
+    public static Specification<Contact> projectSpec(ContactFilter contactFilter) {
+        return new Specification<>() {
+            @Override
+            public Predicate toPredicate(Root<Contact> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                query.distinct(true);
+                Join<Project, Contact> emailContactJoin = root.join("projects");
+                return criteriaBuilder.equal(emailContactJoin.get("id"), contactFilter.getIdProject());
+            }
+        };
+    }
+
+    public static Specification<Contact> lastNameSpec(String lastName) {
+        return new Specification<>() {
+            @Override
+            public Predicate toPredicate(Root<Contact> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                query.distinct(true);
+                return criteriaBuilder.like(root.get(Contact_.lastName), "%" + lastName + "%");
+            }
+        };
+    }
+
+    public static Specification<Contact> firstNameSpec(String firstName) {
+        return new Specification<>() {
+            @Override
+            public Predicate toPredicate(Root<Contact> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                query.distinct(true);
+                return criteriaBuilder.like(root.get(Contact_.firstName), "%" + firstName + "%");
+            }
+        };
+    }
+
+    public static Specification<Contact> patronymicSpec(String patronymic) {
+        return new Specification<>() {
+            @Override
+            public Predicate toPredicate(Root<Contact> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                query.distinct(true);
+                return criteriaBuilder.like(root.get(Contact_.patronymic), "%" + patronymic + "%");
+            }
+        };
     }
 }
 

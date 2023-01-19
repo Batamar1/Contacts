@@ -37,6 +37,12 @@ VALUES (DEFAULT, 'Вячеслав', 'Дергунов', 'Алексеевич',
 INSERT INTO public.contact (id, first_name, last_name, patronymic, number, department_id)
 VALUES (DEFAULT, 'Евгений', 'Скоробаев', 'Александрович', '33333333', 1);
 
+INSERT INTO public.contact (id, first_name, last_name, patronymic, number, department_id)
+VALUES (DEFAULT, 'Евгений', 'Смирнов', 'Александрович', '44444444', 1);
+
+INSERT INTO public.contact (id, first_name, last_name, patronymic, number, department_id)
+VALUES (DEFAULT, 'Максим', 'Скоробаев', 'Александрович', '5555555', 1);
+
 INSERT INTO public.contact_emails (contact_id, emails_id)
 VALUES (1, 1);
 

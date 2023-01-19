@@ -76,5 +76,3 @@ create table contact_projects
 alter table contact_projects
     owner to postgres;
 
-
-
